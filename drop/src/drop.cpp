@@ -4,6 +4,26 @@
 
 #include <server.hpp>
 
+enum LOG_STATE {
+  GOOD,
+  BAD,
+};
+
+void log(const std::string& text, LOG_STATE state) {
+    const std::string RED = "\033[1;31m";
+    const std::string GREEN = "\033[1;32m";
+    const std::string RESET = "\033[0m";
+
+    switch (state) {
+    case GOOD:
+      std::cout << GREEN << "* " << text << RESET << std::endl;
+      break;
+    case BAD:
+      std::cout << RED << "* " << text << RESET << std::endl;
+      break;
+    }
+}
+
 int main(int argc, char** argv) {
   try {
     if (argc == 1) {
@@ -23,10 +43,16 @@ int main(int argc, char** argv) {
     while (in) {
       // try to read next chunk
       in.read(buffer, buffer_size);
+
       // get the number of bytes actually read
       size_t count = in.gcount();
-      // if we read nothing, abort
-      if (!count) {
+
+      // check if we have reached EOF
+      if (in.eof()) {
+	log("Transfer complete", GOOD);
+	break;
+      } else if (in.fail()) {
+	throw std::runtime_error ("error reading from file");
 	break;
       }
 
@@ -34,6 +60,6 @@ int main(int argc, char** argv) {
     }
     delete[] buffer;
   } catch (const std::exception& e) {
-    std::cerr << "\033[1;31mERROR: \033[0m" << e.what() << std::endl;
+    log(e.what(), BAD);
   }
 }
