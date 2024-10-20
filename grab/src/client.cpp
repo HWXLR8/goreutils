@@ -46,19 +46,25 @@ void Client::send(std::string msg) {
 uint32_t Client::read(char* buffer) {
   uint32_t len;
   int result;
+
   // read msg length first (4 bytes)
   result = ::read(sock_, &len, sizeof(len));
-  if (!result) {
-    throw std::runtime_error("lost connection to server");
+  if (result <= 0) {
+    throw std::runtime_error("error reading message length from server");
   }
+
   // change byte order from network->host
   len = ntohl(len);
+
   // read actual message
-  char chunk[len];
-  result = ::read(sock_, buffer, len);
-  if (!result) {
-    throw std::runtime_error("lost connection to server");
+  uint32_t total_read = 0;
+  while (total_read < len) {
+    result = ::read(sock_, buffer + total_read, len - total_read);
+    if (result <= 0) {
+      throw std::runtime_error("error reading message from server");
+    }
+    total_read += result;
   }
-  buffer = chunk;
+
   return len;
 }

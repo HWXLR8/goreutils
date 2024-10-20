@@ -1,7 +1,7 @@
 $(shell mkdir -p bin)
 LDFLAGS = -lpthread
 CXXFLAGS = -std=c++17
-CFLAGS = -O2 -Iinclude
+CFLAGS = -O2 -Iinclude -g
 CPPFLAGS = -Iinclude
 SRC_DIR := src
 OBJ_DIR := bin
