@@ -52,6 +52,8 @@ int main(int argc, char** argv) {
       // check if we have reached EOF
       if (in.eof()) {
 	log("Transfer complete", GOOD);
+	// send whatever is left in the buffer
+	server.send(buffer, count, 0x02);
 	break;
       } else if (in.fail()) {
 	throw std::runtime_error ("error reading from file");
@@ -63,6 +65,7 @@ int main(int argc, char** argv) {
 
     // send done msg
     server.send(0, 0, 0x03);
+    server.waitForAck();
 
     delete[] buffer;
   } catch (const std::exception& e) {

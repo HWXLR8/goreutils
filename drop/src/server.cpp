@@ -91,3 +91,12 @@ void Server::send(char* buffer, size_t num_bytes, uint8_t msg_type) {
 void Server::run() {
   waitForClientConnection();
 }
+
+void Server::waitForAck() {
+  uint8_t msg;
+  size_t result = ::recv(client_, &msg, 1, 0);
+  if (msg != 0xFF) {
+    throw std::runtime_error("Incorrect ACK received");
+  }
+  return;
+}

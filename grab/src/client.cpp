@@ -15,6 +15,10 @@ Client::Client(std::string server_addr, int server_port) {
   // srv_read_th.detach();
 }
 
+Client::~Client() {
+  close(sock_);
+}
+
 void Client::connect(std::string server_addr, int server_port) {
   if ((sock_ = socket(AF_INET, SOCK_STREAM, 0)) < 0 ) {
     throw std::runtime_error("failed to creat socket");
@@ -79,4 +83,9 @@ int32_t Client::read(char* buffer) {
   }
 
   return len;
+}
+
+void Client::ack() {
+  uint8_t msg = 0xFF;
+  ::send(sock_, &msg, 1, 0);
 }

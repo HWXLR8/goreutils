@@ -11,14 +11,15 @@ int main(int argc, char** argv) {
 
   std::string ADDR = "127.0.0.1";
   int PORT = 6969;
-  Client client(ADDR, PORT);
+  Client* client = new Client(ADDR, PORT);
 
   size_t tx_total = 0;
   while (true) {
     uint32_t len;
-    len = client.read(buffer);
+    len = client->read(buffer);
     if (len == -1) {
       std::cout << "\nDownload complete" << std::endl;
+      client->ack();
       break;
     }
     tx_total += len;

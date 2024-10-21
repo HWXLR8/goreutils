@@ -13,7 +13,7 @@ public:
   void waitForClientConnection();
   void read();
   void send(char* buffer, size_t len, uint8_t msg_type);
-  void sendMetadata(char* buffer, size_t len);
+  void waitForAck();
 
 private:
   int sock_;
