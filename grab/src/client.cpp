@@ -43,9 +43,21 @@ void Client::send(std::string msg) {
   ::send(sock_, msg.c_str(), msg.size(), 0);
 }
 
-uint32_t Client::read(char* buffer) {
+int32_t Client::read(char* buffer) {
+  uint8_t msg_type;
   uint32_t len;
   int result;
+
+  // read msg type
+  result = ::read(sock_, &msg_type, 1);
+  switch (msg_type) {
+  case 0x01: // metadata
+  case 0x02: // regular data
+    break;
+
+  case 0x03:
+    return -1;
+  }
 
   // read msg length first (4 bytes)
   result = ::read(sock_, &len, sizeof(len));

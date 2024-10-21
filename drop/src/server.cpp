@@ -74,11 +74,16 @@ void Server::read() {
   // msg_ = std::string(msg, len);
 }
 
-void Server::send(char* buffer, size_t num_bytes) {
+void Server::send(char* buffer, size_t num_bytes, uint8_t msg_type) {
+  // send message type
+  ::send(client_, &msg_type, 1, 0);
+
   // convert to network byte order
   uint32_t len = htonl(num_bytes);
+
   // send length first
   ::send(client_, &len, sizeof(len), 0);
+
   // now send the actual message
   ::send(client_, buffer, num_bytes, 0);
 }

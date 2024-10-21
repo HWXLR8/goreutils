@@ -8,7 +8,7 @@
 class Client {
 public:
   Client(std::string server_addr, int server_port);
-  uint32_t read(char* buffer);
+  int32_t read(char* buffer);
 
 private:
   int sock_;

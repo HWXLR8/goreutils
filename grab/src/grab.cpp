@@ -17,6 +17,10 @@ int main(int argc, char** argv) {
   while (true) {
     uint32_t len;
     len = client.read(buffer);
+    if (len == -1) {
+      std::cout << "\nDownload complete" << std::endl;
+      break;
+    }
     tx_total += len;
     std::cout << "\rTotal bytes received " << tx_total << " B" << std::flush;
     out.write(buffer, len);

@@ -12,7 +12,8 @@ public:
   void run();
   void waitForClientConnection();
   void read();
-  void send(char* buffer, size_t len);
+  void send(char* buffer, size_t len, uint8_t msg_type);
+  void sendMetadata(char* buffer, size_t len);
 
 private:
   int sock_;

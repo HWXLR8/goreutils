@@ -40,6 +40,8 @@ int main(int argc, char** argv) {
     Server server(PORT, MAX_CONN);
     server.run();
 
+    // send metadata
+
     while (in) {
       // try to read next chunk
       in.read(buffer, buffer_size);
@@ -56,8 +58,12 @@ int main(int argc, char** argv) {
 	break;
       }
 
-      server.send(buffer, count);
+      server.send(buffer, count, 0x02);
     }
+
+    // send done msg
+    server.send(0, 0, 0x03);
+
     delete[] buffer;
   } catch (const std::exception& e) {
     log(e.what(), BAD);
