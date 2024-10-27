@@ -70,13 +70,12 @@ void Server::read() {
   if (!result) {
     throw std::runtime_error("failed to read from client, is the socket alive?");
   }
-
-  // msg_ = std::string(msg, len);
 }
 
-void Server::send(char* buffer, size_t num_bytes, uint8_t msg_type) {
+void Server::send(const char* buffer, size_t num_bytes, MSG_TYPE msg_type) {
   // send message type
-  ::send(client_, &msg_type, 1, 0);
+  uint8_t msg_type_8 = static_cast<uint8_t>(msg_type);
+  ::send(client_, &msg_type_8, 1, 0);
 
   // convert to network byte order
   uint32_t len = htonl(num_bytes);
@@ -94,7 +93,7 @@ void Server::run() {
 
 void Server::waitForAck() {
   uint8_t msg;
-  size_t result = ::recv(client_, &msg, 1, 0);
+  ::recv(client_, &msg, 1, 0);
   if (msg != 0xFF) {
     throw std::runtime_error("Incorrect ACK received");
   }

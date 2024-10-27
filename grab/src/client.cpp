@@ -47,19 +47,26 @@ void Client::send(std::string msg) {
   ::send(sock_, msg.c_str(), msg.size(), 0);
 }
 
-int32_t Client::read(char* buffer) {
-  uint8_t msg_type;
+int32_t Client::read(char* buffer, MSG_TYPE expected_msg_type) {
+  uint8_t recvd_msg_type_8; // network representation of msg_type
   uint32_t len;
   int result;
 
   // read msg type
-  result = ::read(sock_, &msg_type, 1);
-  switch (msg_type) {
-  case 0x01: // metadata
-  case 0x02: // regular data
-    break;
+  result = ::read(sock_, &recvd_msg_type_8, 1);
+  MSG_TYPE recvd_msg_type = static_cast<MSG_TYPE>(recvd_msg_type_8);
+  // msg type as expected?
+  if (recvd_msg_type != expected_msg_type) {
+    // TERMINATE/DATA mismatches are the only type allowed
+    if (recvd_msg_type != TERMINATE && expected_msg_type != DATA) {
+      std::string err =
+	std::string("Expected message type: ") + msgTypeToStr(expected_msg_type) +
+	", Received message type: " + msgTypeToStr(recvd_msg_type);
+      throw std::runtime_error(err);
+    }
+  }
 
-  case 0x03:
+  if (recvd_msg_type == TERMINATE) {
     return -1;
   }
 
@@ -88,4 +95,14 @@ int32_t Client::read(char* buffer) {
 void Client::ack() {
   uint8_t msg = 0xFF;
   ::send(sock_, &msg, 1, 0);
+}
+
+std::string Client::msgTypeToStr(const MSG_TYPE& msg_type) {
+  switch (msg_type) {
+  case FILE_NAME: return "FILE_NAME";
+  case FILE_HASH: return "FILE_HASH";
+  case DATA: return "DATA";
+  case TERMINATE: return "TERMINATE";
+  default: return "UNKNOWN";
+  }
 }

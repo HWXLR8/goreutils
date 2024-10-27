@@ -5,6 +5,13 @@
 #include <vector>
 #include <string>
 
+enum MSG_TYPE {
+  FILE_NAME = 1,
+  FILE_HASH = 2,
+  DATA = 3,
+  TERMINATE = 4,
+};
+
 class Server {
 public:
   Server(unsigned int port, unsigned int max_connections);
@@ -12,7 +19,7 @@ public:
   void run();
   void waitForClientConnection();
   void read();
-  void send(char* buffer, size_t len, uint8_t msg_type);
+  void send(const char* buffer, size_t len, MSG_TYPE msg_type);
   void waitForAck();
 
 private:
