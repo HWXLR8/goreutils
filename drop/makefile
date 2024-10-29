@@ -1,34 +1,33 @@
-TARGET = drop
+CXX = g++
+CXXFLAGS = -Iinclude -Wall -Wextra -O2
 
 SRC_DIR = src
 INC_DIR = include
-BIN_DIR = bin
 LIB_DIR = ../lib
+BIN_DIR = bin
 
-SRCS = $(wildcard $(SRC_DIR)/*.cpp)
-OBJS = $(patsubst $(SRC_DIR)/%.cpp,$(BIN_DIR)/%.o,$(SRCS))
+BINS = drop grab
 
-LIB_SRCS = $(wildcard $(LIB_DIR)/*.cpp)
-LIB_OBJS = $(patsubst $(LIB_DIR)/%.cpp,$(BIN_DIR)/%.o,$(LIB_SRCS))
+DROP_SRCS = $(SRC_DIR)/drop.cpp $(SRC_DIR)/server.cpp $(LIB_DIR)/common.cpp
+GRAB_SRCS = $(SRC_DIR)/grab.cpp $(SRC_DIR)/client.cpp $(LIB_DIR)/common.cpp
 
-CXX = g++
-CXXFLAGS = -I$(INC_DIR) -I$(LIB_DIR) -Wall -Wextra
-LDFLAGS = -L$(LIB_DIR)
+DROP_OBJS = $(BIN_DIR)/drop.o $(BIN_DIR)/server.o $(LIB_DIR)/common.o
+GRAB_OBJS = $(BIN_DIR)/grab.o $(BIN_DIR)/client.o $(LIB_DIR)/common.o
 
-all: $(TARGET)
+all: $(BINS)
 
-$(TARGET): $(OBJS) $(LIB_OBJS)
-	$(CXX) -o $@ $^ $(LDFLAGS)
+drop: $(DROP_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(LIB_DIR)
 
+grab: $(GRAB_OBJS)
+	$(CXX) $(CXXFLAGS) -o $@ $^ -L$(LIB_DIR)
+
+# compile source files into object files
 $(BIN_DIR)/%.o: $(SRC_DIR)/%.cpp
-	@mkdir -p $(BIN_DIR)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-$(BIN_DIR)/%.o: $(LIB_DIR)/%.cpp
-	@mkdir -p $(BIN_DIR)
+	mkdir -p $(BIN_DIR)
 	$(CXX) $(CXXFLAGS) -c $< -o $@
 
 clean:
-	rm -rf $(BIN_DIR)/*.o $(TARGET)
+	rm -f $(BIN_DIR)/*.o $(BINS)
 
-.PHONY: all clean
+.PHONY: all clean list
