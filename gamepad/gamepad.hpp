@@ -4,15 +4,14 @@
 
 class Joystick {
  public:
-  Joystick(int index = 0);
+  Joystick();
   ~Joystick();
+  void open(int index);
   void read();
+  void list();
 
  private:
   SDL_Joystick *js_ = nullptr;
-  int index_;
+  int index_ = 0;
   int num_buttons_;
-
-  void list();
-  void open();
 };

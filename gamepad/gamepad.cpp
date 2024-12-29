@@ -1,6 +1,7 @@
 #include <iostream>
 
 #include <signal.h>
+#include <stdlib.h>
 
 #include "gamepad.hpp"
 
@@ -11,12 +12,7 @@ void sigint(int sig) {
   run = false;
 }
 
-Joystick::Joystick(int index) {
-  index_ = index;
-  list();
-  this->open();
-  num_buttons_ = SDL_JoystickNumButtons(js_);
-  std::cout << "\033[?25l"; // hide the cursor
+Joystick::Joystick() {
 }
 
 Joystick::~Joystick() {
@@ -38,12 +34,15 @@ void Joystick::list() {
   std::cout << std::endl;
 }
 
-void Joystick::open() {
+void Joystick::open(int index) {
+  index_ = index;
   js_ = SDL_JoystickOpen(index_);
   if (js_ == NULL) {
     SDL_Quit();
     throw std::runtime_error("failed to open joystick. SDL_Error: " + std::string(SDL_GetError()));
   }
+  num_buttons_ = SDL_JoystickNumButtons(js_);
+  std::cout << "\033[?25l"; // hide the cursor
 }
 
 void Joystick::read() {
@@ -97,7 +96,17 @@ int main(int argc, char *argv[]) {
 
   Joystick* j = new Joystick();
 
+  // no index, list joysticks
+  if (argc == 1) {
+    j->list();
+    std::cout << "No joystick selected." << std::endl;
+    std::cout << "Usage: ./gamepad [index]" << std::endl;
+    return 0;
+  }
+
   signal(SIGINT, sigint);
+
+  j->open(atoi(argv[1]));
   while (run) {
     SDL_PumpEvents();
     j->read();
