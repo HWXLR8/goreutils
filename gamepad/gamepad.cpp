@@ -48,44 +48,46 @@ void Joystick::open(int index) {
 void Joystick::read() {
   std::cout << "\r";
 
-  uint8_t hat_state = SDL_JoystickGetHat(js_, 0);
+    //  D-pad (hat)
+    uint8_t hat_state = SDL_JoystickGetHat(js_, 0);
 
-  // D-pad up
-  if (hat_state & SDL_HAT_UP) {
-    std::cout << "U";
-  } else {
-    std::cout << "*";
-  }
+    if (hat_state & SDL_HAT_UP) { std::cout << "U"; } else { std::cout << "*"; }
+    if (hat_state & SDL_HAT_DOWN) { std::cout << "D"; } else { std::cout << "*"; }
+    if (hat_state & SDL_HAT_LEFT) { std::cout << "L"; } else { std::cout << "*"; }
+    if (hat_state & SDL_HAT_RIGHT) { std::cout << "R "; } else { std::cout << "* "; }
 
-  // D-pad down
-  if (hat_state & SDL_HAT_DOWN) {
-    std::cout << "D";
-  } else {
-    std::cout << "*";
-  }
-
-  // D-pad left
-  if (hat_state & SDL_HAT_LEFT) {
-    std::cout << "L";
-  } else {
-    std::cout << "*";
-  }
-
-  // D-pad right
-  if (hat_state & SDL_HAT_RIGHT) {
-    std::cout << "R ";
-  } else {
-    std::cout << "* ";
-  }
-
-  for (int i = 0; i < num_buttons_; ++i) {
-    if (SDL_JoystickGetButton(js_, i)) {
-      std::cout << "1";
-    } else {
-      std::cout << "0";
+    // buttons
+    for (int i = 0; i < num_buttons_; ++i) {
+        if (SDL_JoystickGetButton(js_, i)) { std::cout << "1"; } else { std::cout << "0"; }
     }
-  }
-  std::cout.flush();
+
+    std::cout << "\n\r";
+
+    // analog axes
+    const int axis_display_width = 32;
+    for (int i = 0; i < SDL_JoystickNumAxes(js_); ++i) {
+      std::cout << "\r";
+
+      Sint16 axis_value = SDL_JoystickGetAxis(js_, i);
+      int normalized = (axis_value + 32768) * 256 / 65536;
+      int position = (normalized * axis_display_width) / 256;
+
+      // axis visualizer
+      std::cout << "analog " << i << " [";
+      for (int j = 0; j < axis_display_width; ++j) {
+        std::cout << (j == position ? "*" : " ");
+      }
+      std::cout << "] " << normalized << "/256";
+
+      // move to next line if not last axis
+      if (i < SDL_JoystickNumAxes(js_) - 1) std::cout << "\n\r";
+    }
+
+    std::cout.flush();
+
+    // move cursor back up for next update
+    std::cout << "\033[" << SDL_JoystickNumAxes(js_) << "A";  // ANSI escape: move up N lines
+
 }
 
 int main(int argc, char *argv[]) {
