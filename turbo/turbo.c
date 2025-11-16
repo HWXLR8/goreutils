@@ -68,7 +68,7 @@ int main(int argc, char *argv[]) {
             if (dt > 0.0) {
               // presses-1 intervals over dt seconds
               double rate = (press_count - 1) / dt;
-              printf("\rButton %d: %.2f presses/s (presses: %u, window: %.2fs)",
+              printf("\rButton %d: %.2f Hz (presses: %u, window: %.2fs)",
                      active_button, rate, press_count, dt);
               fflush(stdout);
             }
@@ -94,7 +94,7 @@ int main(int argc, char *argv[]) {
           double dt = (last_down_ms - first_down_ms) / 1000.0;
           if (dt > 0.0) {
             double rate = (press_count - 1) / dt;
-            printf("\nButton %d final result: %.2f presses/s (presses: %u over %.2fs)\n",
+            printf("\nButton %d final result: %.2f Hz (presses: %u over %.2fs)\n",
                    active_button, rate, press_count, dt);
           } else {
             printf("\nButton %d: not enough time to estimate turbo rate.\n",
